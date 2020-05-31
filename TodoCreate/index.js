@@ -1,16 +1,35 @@
-module.exports = async function (context, req) {
-    context.log('JavaScript HTTP trigger function processed a request.');
+const azure = require('azure-storage');
+const uuid = require('uuid');
 
-    if (req.query.name || (req.body && req.body.name)) {
-        context.res = {
-            // status: 200, /* Defaults to 200 */
-            body: "Hello " + (req.query.name || req.body.name)
-        };
+const tableService = azure.createTableService();
+const tableName = "mytable";
+
+module.exports = function (context, req) {
+    context.log('Start ItemCreate');
+
+    if (req.body) {
+
+        // TODO: Add some object validation logic & 
+        //       make sure the object is flat
+
+        const item = req.body;
+        item["PartitionKey"] = "Partition";
+        item["RowKey"] = uuid.v1();
+
+        // Use { echoContent: true } if you want to return the created item including the Timestamp & etag
+        tableService.insertEntity(tableName, item, { echoContent: true }, function (error, result, response) {
+            if (!error) {
+                context.res.status(201).json(response);
+            } else {
+                context.res.status(500).json({ error: error });
+            }
+        });
     }
     else {
         context.res = {
             status: 400,
-            body: "Please pass a name on the query string or in the request body"
+            body: "Please pass an item in the request body"
         };
+        context.done();
     }
 };
