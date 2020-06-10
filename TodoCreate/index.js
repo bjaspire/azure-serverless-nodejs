@@ -1,22 +1,17 @@
 const azure = require('azure-storage');
 const uuid = require('uuid');
 
-const tableService = azure.createTableService();
-const tableName = "mytable";
+const connstr = 'AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;';
+const tableService = azure.createTableService(connstr);
+const tableName = "todo";
 
 module.exports = function (context, req) {
     context.log('Start ItemCreate');
 
     if (req.body) {
-
-        // TODO: Add some object validation logic & 
-        //       make sure the object is flat
-
         const item = req.body;
         item["PartitionKey"] = "Partition";
         item["RowKey"] = uuid.v1();
-
-        // Use { echoContent: true } if you want to return the created item including the Timestamp & etag
         tableService.insertEntity(tableName, item, { echoContent: true }, function (error, result, response) {
             if (!error) {
                 context.res.status(201).json(response);

@@ -8,6 +8,7 @@
   "author": "",
   "dependencies": {
     "azure-storage": "^2.10.3",
-    "uuid": "^8.1.0"
+    "uuid": "^8.1.0",
+    "soap": "^0.31.0"
   }
 }
