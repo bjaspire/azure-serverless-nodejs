@@ -1,35 +1,32 @@
-var soap = require('soap');
+var soapx = require('soap');
 
-module.exports = async function (context, req) {
-    var barcode = req.query.barcode || req.body.barcode;
+module.exports = async function (context, req) {  
+    context.log('JavaScript HTTP trigger function processed a request.');
     var wsdlUrl = 'http://www.dneonline.com/calculator.asmx?wsdl';
-    var data = 'sd';
-    soap.createClient(wsdlUrl, function (err, soapClient) {
-        // we now have a soapClient - we also need to make sure there's no `err` here. 
+    soapx.createClient(wsdlUrl, function (err, soapClient) {        
         if (err) {
             context.res = {
-                status: 500, /* Defaults to 200 */
+                status: 500,
                 body: err
             };
-        }            
+        } 
+        context.req = {
+            status: 200,
+            body: "aa"
+        }
         soapClient.Add({
             intA: 1,
             intB: 2
         }, function (err, result) {
             if (err) {
                 context.res = {
-                    status: 500, /* Defaults to 200 */
-                    body: err
+                    status: 500,
+                    body: 'error while fetch data'
                 };
-            }
-            data = result.AddResult;
-                     
+            }         
+            context.res = {
+                body: result
+            };                    
         });
-    });
-
-    context.res ={
-        status:200,
-        body: data + ' dd'
-    }  
-    
+    });  
 }
